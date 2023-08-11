@@ -9,3 +9,12 @@ clean:
 
 run:
 	$(ACTIVATE_VENV); python3 main.py
+
+docker-run: docker-build
+	docker run -d take-a-drink
+
+docker-stop:
+	docker stop take-a-drink
+
+docker-build:
+	docker build -t take-a-drink .

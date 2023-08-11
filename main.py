@@ -1,3 +1,5 @@
+import os
+
 import discord
 from discord.ext import commands
 import yaml
@@ -6,6 +8,8 @@ import json
 
 intents = discord.Intents.default()
 bot = commands.Bot(intents=intents)
+
+prefix = 'drinks/'
 
 # crappy config setup
 with open('config-prod.yaml') as config:
@@ -83,7 +87,7 @@ async def display_user_drinks(ctx: discord.interactions, user: discord.User):
 
 def get_guild_drink_tracker(guild_id: discord.Guild.id):
     try:
-        with open("drinks/" + str(guild_id) + ".json") as json_file:
+        with open(prefix + str(guild_id) + ".json") as json_file:
             return json.load(json_file)
     except Exception as err:
         print(err)
@@ -91,8 +95,11 @@ def get_guild_drink_tracker(guild_id: discord.Guild.id):
 
 
 def write(drink_tracker: dict, guild_id: discord.Guild.id):
-    file = open("drinks/" + str(guild_id) + ".json", "w")
-    file.write(json.dumps(drink_tracker))
+    with open(prefix + str(guild_id) + ".json", "w") as file:
+        file.write(json.dumps(drink_tracker))
 
+
+if not os.path.exists(os.path.dirname(prefix)):
+    os.mkdir(prefix)
 
 bot.run(CONFIG['token'])
