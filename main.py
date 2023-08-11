@@ -73,14 +73,14 @@ async def display_all_drinks(ctx: discord.interactions):
     if dt == {}:
         await ctx.respond("Imagine not having anyone on the board")
     else:
-        await ctx.respond(dt)
+        await ctx.respond(embed=format_output(dt))
 
 
 @bot.slash_command(name="display_user_drinks", guild_ids=list(CONFIG['guild_ids']))
 async def display_user_drinks(ctx: discord.interactions, user: discord.User):
     dt = get_guild_drink_tracker(ctx.guild_id)
     if dt.get(user.name):
-        await ctx.respond(user.name + " drinks: " + str(dt[user.name]))
+        await ctx.respond(embed=format_output({user.name: dt[user.name]}))
     else:
         await ctx.respond(f"{user} is a coward with no drinks".format(user=user.name))
 
@@ -92,6 +92,14 @@ def get_guild_drink_tracker(guild_id: discord.Guild.id):
     except Exception as err:
         print(err)
         return {}
+
+
+def format_output(drinks: dict):
+    res = discord.Embed(title="Take a Drink Chart", colour=discord.Colour.green())
+    for key, value in drinks.items():
+        row = f"> Chugs: {value['chug']}\n> Shots: {value['shot']}\n> Drinks: {value['drink']}"
+        res.add_field(name=key, value=row)
+    return res
 
 
 def write(drink_tracker: dict, guild_id: discord.Guild.id):
